@@ -1,32 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 void print(char *filename) {
-
-    // open file
-    // read
-    // print
-    // clean up and close
-
-    FILE *file;
+    int file;
     char *buff;
     int buff_size = 2;
+    size_t byte_read = 0;
 
-    buff = malloc(sizeof(*buff) * buff_size);
+    buff = calloc(buff_size, sizeof(*buff));
     if (buff == NULL) {
         perror("Memory allocation failed.");
         return;
     }
-    file = fopen(filename, "r");
-    if (file == NULL) {
+    file = open(filename, O_RDONLY);
+    if (file == -1) {
         perror("Opening file failed.");
         return;
     }
-    while (fgets(buff, buff_size, file) != NULL) {
-        printf("%s", buff);
+    while ((byte_read = read(file, buff, buff_size)) != 0) {
+        write(1, buff, byte_read);
     }
-
-    fclose(file);
+    close(file);
     free(buff);
 }
 
